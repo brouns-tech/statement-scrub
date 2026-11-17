@@ -13,11 +13,10 @@ from statement_scrub.scenario import generate
 from statement_scrub.detection import suggest, needs_review, status, priority, is_date, is_amount, static_allowed
 
 
-def prepare(data, seed=42, year=2025, count=0):
+def prepare(data, seed=42, year=2025):
     doc = extract(data)
-    if not count:
-        count = max(1, min(200, max(sum(is_date(f.text) for f in doc.fragments),
-                                  sum(is_amount(f.text) for f in doc.fragments))))
+    count = max(1, min(200, max(sum(is_date(f.text) for f in doc.fragments),
+                              sum(is_amount(f.text) for f in doc.fragments))))
     values = generate(int(seed), int(count), int(year))
     rows = suggest(doc, values)
     return doc, values, rows
@@ -37,15 +36,13 @@ def main():
                 st.caption('Defaults work without changes. Adjust these only if you want additional control.')
                 seed = st.number_input('Synthetic seed', min_value=0, max_value=1000000, value=42,
                                        help='Controls fictional values; never derived from the document.')
-                year = st.number_input('Synthetic reporting year', min_value=2000, max_value=2099, value=2025,
-                                       help='Year used for fictional dates. Original transaction dates are replaced.')
-                count = st.number_input('Transaction count (0 = detect)', min_value=0, max_value=200, value=0,
-                                        help='Zero estimates the scenario size from recognised dates and amounts; otherwise use this many fictional transactions.')
+                year = st.number_input('Synthetic date year', min_value=2000, max_value=2099, value=2025,
+                                       help='Year used for generated fictional dates, regardless of document type.')
                 st.caption('Applied when you click Anonymise.')
     if start:
         try:
             data = uploaded.getvalue()
-            doc, values, rows = prepare(data,seed,year,count)
+            doc, values, rows = prepare(data,seed,year)
         except Exception:
             st.error('Cannot process this PDF. Use an unencrypted, text-based PDF within the supported limits.')
         else:

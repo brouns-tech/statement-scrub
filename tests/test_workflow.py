@@ -187,7 +187,7 @@ def test_single_picker_and_collapsed_details():
     assert len(at.expander) == 1
     assert at.expander[0].label == 'Optional synthetic settings'
     assert not at.expander[0].proto.expanded
-    assert len(at.number_input)==3
+    assert [n.label for n in at.number_input] == ['Synthetic seed', 'Synthetic date year']
     assert all(n.proto.help for n in at.number_input)
 
 
